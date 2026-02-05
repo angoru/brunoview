@@ -6,7 +6,7 @@ BrunoView is a local, web-based viewer for Bruno JSON test logs. It can load a
 ## Run (Bun)
 
 ```bash
-bun run brunoview.ts /home/angoru/Code/brunostash/api/results.json
+bun run brunoview.ts /path/to/results.json
 ```
 
 This starts a local server, opens your browser, and preloads the JSON file.
