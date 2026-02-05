@@ -1,5 +1,7 @@
 # BrunoView
 
+**Made with AI**
+
 BrunoView is a local, web-based viewer for Bruno JSON test logs. It can load a
 `results.json` file automatically or via drag-and-drop.
 
