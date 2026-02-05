@@ -13,6 +13,10 @@
     "README.md"
   ],
   "scripts": {
+    "build:linux-x64": "bun build --compile ./brunoview.ts --outfile dist/linux-x64/brunoview",
+    "build:macos-x64": "bun build --compile ./brunoview.ts --outfile dist/macos-x64/brunoview",
+    "build:macos-arm64": "bun build --compile ./brunoview.ts --outfile dist/macos-arm64/brunoview",
+    "build:windows-x64": "bun build --compile ./brunoview.ts --outfile dist/windows-x64/brunoview.exe",
     "build:bin": "bun build --compile ./brunoview.ts --outfile dist/local/brunoview"
   }
 }

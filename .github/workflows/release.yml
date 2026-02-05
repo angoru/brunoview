@@ -1,0 +1,76 @@
+name: build-release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            ext: ""
+          - os: windows-latest
+            platform: windows
+            arch: x64
+            ext: ".exe"
+          - os: macos-13
+            platform: macos
+            arch: x64
+            ext: ""
+          - os: macos-14
+            platform: macos
+            arch: arm64
+            ext: ""
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest"
+
+      - name: Build binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          out_dir="dist/${{ matrix.platform }}-${{ matrix.arch }}"
+          mkdir -p "$out_dir"
+          bun build --compile ./brunoview.ts --outfile "$out_dir/brunoview${{ matrix.ext }}"
+          cp -R public "$out_dir/public"
+
+      - name: Package zip
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+import os
+import zipfile
+
+platform = "${{ matrix.platform }}"
+arch = "${{ matrix.arch }}"
+root = f"dist/{platform}-{arch}"
+zip_name = f"dist/brunoview-{platform}-{arch}.zip"
+
+with zipfile.ZipFile(zip_name, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+    for base, _, files in os.walk(root):
+        for name in files:
+            path = os.path.join(base, name)
+            rel = os.path.relpath(path, root)
+            zf.write(path, rel)
+print(f"Wrote {zip_name}")
+PY
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/brunoview-${{ matrix.platform }}-${{ matrix.arch }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

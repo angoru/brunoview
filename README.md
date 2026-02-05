@@ -36,3 +36,8 @@ bun build --compile ./brunoview.ts --outfile dist/windows-x64/brunoview.exe
 
 The CLI will run the correct binary and point it at the packaged `public/`
 assets automatically.
+
+## Release automation
+
+Tag a version like `v0.1.0` and push. GitHub Actions will build binaries for
+Linux, macOS (x64 + arm64), and Windows, then attach zips to the release.
