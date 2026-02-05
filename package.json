@@ -1,0 +1,18 @@
+{
+  "name": "@angoru/brunoview",
+  "version": "0.1.0",
+  "description": "Bruno JSON log viewer",
+  "license": "MIT",
+  "bin": {
+    "brunoview": "bin/brunoview.js"
+  },
+  "files": [
+    "bin/",
+    "public/",
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build:bin": "bun build --compile ./brunoview.ts --outfile dist/local/brunoview"
+  }
+}

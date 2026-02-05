@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BrunoView - Bruno JSON Log Viewer</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="bruno-body">
+    <header class="bruno-header">
+      <div class="container-fluid bruno-container">
+        <div class="bruno-header-inner">
+          <div class="bruno-brand">
+            <span class="bruno-badge">BrunoView</span>
+            <div class="bruno-brand-text">
+              <h1 class="bruno-title">Bruno JSON Log Viewer</h1>
+              <p class="bruno-subtitle">
+                Convert and inspect Bruno test runs fast.
+              </p>
+            </div>
+          </div>
+
+          <div class="bruno-actions">
+            <div class="bruno-action">
+              <span class="bruno-action-label">Load JSON</span>
+              <input
+                id="file-input"
+                class="form-control form-control-sm bruno-file-input"
+                type="file"
+                accept="application/json,.json"
+              />
+              <small id="file-meta" class="text-secondary bruno-file-meta"
+                >No file loaded</small
+              >
+            </div>
+            <div class="bruno-action">
+              <span class="bruno-action-label">Drop file</span>
+              <div id="drop-zone" class="bruno-dropzone">
+                Drop results.json
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="py-2 bruno-summary-section">
+      <div class="container-fluid bruno-container">
+        <div id="summary" class="row g-3 bruno-summary"></div>
+      </div>
+    </section>
+
+    <section class="py-2">
+      <div class="container-fluid bruno-container">
+        <div class="card bruno-toolbar-card">
+          <div class="card-body bruno-toolbar">
+            <div class="toolbar-item toolbar-search">
+              <label class="form-label bruno-label" for="search-input">Search</label>
+              <input
+                id="search-input"
+                class="form-control form-control-sm"
+                type="search"
+                placeholder="Name, path, URL, data"
+              />
+            </div>
+
+            <div class="toolbar-item toolbar-reset">
+              <label class="form-label bruno-label">&nbsp;</label>
+              <button id="reset-filters" class="btn btn-sm btn-outline-secondary">
+                Reset filters
+              </button>
+            </div>
+
+            <div class="toolbar-item">
+              <label class="form-label bruno-label">Search In</label>
+              <div id="search-scope" class="chips"></div>
+            </div>
+
+            <div class="toolbar-item toolbar-sort">
+              <label class="form-label bruno-label">Sort</label>
+              <select id="sort-select" class="form-select form-select-sm">
+                <option value="status">Status</option>
+                <option value="name">Name</option>
+                <option value="duration">Duration</option>
+                <option value="http">HTTP Status</option>
+                <option value="path">Path</option>
+              </select>
+            </div>
+
+            <div class="toolbar-item">
+              <label class="form-label bruno-label">Status</label>
+              <div id="status-filters" class="chips"></div>
+            </div>
+
+            <div class="toolbar-item">
+              <label class="form-label bruno-label">Methods</label>
+              <div id="method-filters" class="chips"></div>
+            </div>
+
+            <div class="toolbar-item">
+              <label class="form-label bruno-label">HTTP</label>
+              <div id="http-filters" class="chips"></div>
+            </div>
+
+            <div class="toolbar-item">
+              <label class="form-label bruno-label">Run</label>
+              <div id="run-filters" class="chips"></div>
+            </div>
+
+            <div class="toolbar-item toolbar-path">
+              <label class="form-label bruno-label">Path</label>
+              <select id="path-filter" class="form-select form-select-sm"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-2">
+      <div class="container-fluid bruno-container">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="card bruno-panel bruno-panel-table">
+              <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h2 class="h5 mb-0">Results</h2>
+                  <span id="results-count" class="badge text-bg-secondary">0</span>
+                </div>
+                <div id="results-table"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card bruno-panel">
+              <div class="card-body">
+                <div
+                  id="detail-empty"
+                  class="alert alert-light bruno-empty"
+                >
+                  Select a row to see request and response details.
+                </div>
+                <div id="detail-content" class="detail-content"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="alert alert-primary bruno-toast" role="status" aria-live="polite"></div>
+
+    <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="app.js"></script>
+  </body>
+</html>
