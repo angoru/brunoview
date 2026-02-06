@@ -1,6 +1,6 @@
 {
   "name": "@angoru/brunoview",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Bruno JSON log viewer",
   "license": "MIT",
   "bin": {
