@@ -50,23 +50,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-import os
-import zipfile
-
-platform = "${{ matrix.platform }}"
-arch = "${{ matrix.arch }}"
-root = f"dist/{platform}-{arch}"
-zip_name = f"dist/brunoview-{platform}-{arch}.zip"
-
-with zipfile.ZipFile(zip_name, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-    for base, _, files in os.walk(root):
-        for name in files:
-            path = os.path.join(base, name)
-            rel = os.path.relpath(path, root)
-            zf.write(path, rel)
-print(f"Wrote {zip_name}")
-PY
+          python3 -c "
+          import os, zipfile
+          platform = '${{ matrix.platform }}'
+          arch = '${{ matrix.arch }}'
+          root = f'dist/{platform}-{arch}'
+          zip_name = f'dist/brunoview-{platform}-{arch}.zip'
+          with zipfile.ZipFile(zip_name, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+              for base, _, files in os.walk(root):
+                  for name in files:
+                      path = os.path.join(base, name)
+                      rel = os.path.relpath(path, root)
+                      zf.write(path, rel)
+          print(f'Wrote {zip_name}')
+          "
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
