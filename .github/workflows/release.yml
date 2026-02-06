@@ -1,4 +1,4 @@
-name: build-release
+name: publish-npm
 
 on:
   push:
@@ -9,76 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            arch: x64
-            ext: ""
-          - os: windows-latest
-            platform: windows
-            arch: x64
-            ext: ".exe"
-          - os: macos-14
-            platform: macos
-            arch: arm64
-            ext: ""
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: "latest"
-
-      - name: Build binary
-        shell: bash
-        run: |
-          set -euo pipefail
-          out_dir="dist/${{ matrix.platform }}-${{ matrix.arch }}"
-          mkdir -p "$out_dir"
-          bun build --compile ./brunoview.ts --outfile "$out_dir/brunoview${{ matrix.ext }}"
-          cp -R public "$out_dir/public"
-
-      - name: Package zip
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 -c "
-          import os, zipfile
-          platform = '${{ matrix.platform }}'
-          arch = '${{ matrix.arch }}'
-          root = f'dist/{platform}-{arch}'
-          zip_name = f'dist/brunoview-{platform}-{arch}.zip'
-          with zipfile.ZipFile(zip_name, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
-              for base, _, files in os.walk(root):
-                  for name in files:
-                      path = os.path.join(base, name)
-                      rel = os.path.relpath(path, root)
-                      zf.write(path, rel)
-          print(f'Wrote {zip_name}')
-          "
-
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/brunoview-${{ matrix.platform }}-${{ matrix.arch }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-${{ matrix.platform }}-${{ matrix.arch }}
-          path: dist/${{ matrix.platform }}-${{ matrix.arch }}
-
-  publish-npm:
-    needs: build
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -89,15 +20,10 @@ jobs:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-          pattern: dist-*
-          merge-multiple: true
-
-      - name: Verify artifacts
-        run: ls -la dist/*/
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm
         run: npm publish --access public
