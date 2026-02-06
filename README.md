@@ -28,6 +28,8 @@ One-off run (no global install):
 npx @angoru/brunoview /path/to/results.json
 ```
 
+> **Note:** BrunoView requires [Bun](https://bun.sh) to run. If Bun is not installed, the CLI will attempt to use it via npx.
+
 ## Load manually
 
 - Click **Load JSON file** and select a file.
@@ -38,23 +40,7 @@ npx @angoru/brunoview /path/to/results.json
 - Large files may take a few seconds to parse in the browser.
 - The viewer is static HTML/JS and runs fully offline.
 
-## Distribute (npm with prebuilt binaries)
-
-1) Build a binary for each platform you want to ship:
-
-```bash
-bun build --compile ./brunoview.ts --outfile dist/linux-x64/brunoview
-bun build --compile ./brunoview.ts --outfile dist/macos-arm64/brunoview
-bun build --compile ./brunoview.ts --outfile dist/macos-x64/brunoview
-bun build --compile ./brunoview.ts --outfile dist/windows-x64/brunoview.exe
-```
-
-2) Publish to npm from this repo (package name is `@angoru/brunoview`).
-
-The CLI will run the correct binary and point it at the packaged `public/`
-assets automatically.
-
 ## Release automation
 
-Tag a version like `v0.1.0` and push. GitHub Actions will build binaries for
-Linux, macOS (x64 + arm64), and Windows, then attach zips to the release.
+Tag a version like `v0.1.0` and push. GitHub Actions will create a GitHub
+release and publish the package to npm.
