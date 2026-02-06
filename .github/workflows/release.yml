@@ -23,7 +23,7 @@ jobs:
             platform: windows
             arch: x64
             ext: ".exe"
-          - os: macos-15-large
+          - os: macos-13
             platform: macos
             arch: x64
             ext: ""
