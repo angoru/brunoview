@@ -21,13 +21,13 @@
       <div class="container-fluid bruno-container">
         <div class="bruno-header-inner">
           <div class="bruno-brand">
-            <span class="bruno-badge">BrunoView</span>
-            <span class="bruno-ai">Made with AI</span>
-            <div class="bruno-brand-text">
-              <h1 class="bruno-title">Bruno JSON Log Viewer</h1>
-              <p class="bruno-subtitle">
-                Convert and inspect Bruno test runs fast.
-              </p>
+            <div class="bruno-logo">
+              <span class="bruno-logo-icon">B</span>
+              <div class="bruno-brand-text">
+                <h1 class="bruno-title">BrunoView</h1>
+                <p class="bruno-subtitle">JSON Log Viewer</p>
+                <span class="bruno-ai">Made with AI</span>
+              </div>
             </div>
           </div>
 
@@ -43,6 +43,7 @@
               <small id="file-meta" class="text-secondary bruno-file-meta"
                 >No file loaded</small
               >
+              <small id="file-error" class="bruno-file-error" role="status" aria-live="polite"></small>
             </div>
             <div class="bruno-action">
               <span class="bruno-action-label">Drop file</span>
@@ -73,13 +74,6 @@
                 type="search"
                 placeholder="Name, path, URL, data"
               />
-            </div>
-
-            <div class="toolbar-item toolbar-reset">
-              <label class="form-label bruno-label">&nbsp;</label>
-              <button id="reset-filters" class="btn btn-sm btn-outline-secondary">
-                Reset filters
-              </button>
             </div>
 
             <div class="toolbar-item">
@@ -121,6 +115,13 @@
             <div class="toolbar-item toolbar-path">
               <label class="form-label bruno-label">Path</label>
               <select id="path-filter" class="form-select form-select-sm"></select>
+            </div>
+
+            <div class="toolbar-item toolbar-reset">
+              <label class="form-label bruno-label">&nbsp;</label>
+              <button id="reset-filters" class="btn btn-sm btn-outline-danger">
+                Reset filters
+              </button>
             </div>
           </div>
         </div>

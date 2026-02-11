@@ -37,8 +37,29 @@ body.bruno-body {
 .bruno-brand {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  min-width: 260px;
+  gap: 0.75rem;
+}
+
+.bruno-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bruno-logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
 .bruno-badge {
@@ -54,13 +75,16 @@ body.bruno-body {
 
 .bruno-ai {
   background: #e0f2fe;
-  color: #0f172a;
+  color: #0369a1;
   border-radius: 999px;
-  padding: 0.22rem 0.6rem;
-  font-weight: 700;
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
+  padding: 0.12rem 0.4rem;
+  font-weight: 600;
+  font-size: 0.48rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-block;
+  margin-top: 0.1rem;
 }
 
 .bruno-brand-text {
@@ -70,20 +94,22 @@ body.bruno-body {
 }
 
 .bruno-title {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .bruno-subtitle {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--bruno-soft);
   margin: 0;
+  letter-spacing: 0.02em;
 }
 
 .bruno-actions {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 0.75rem;
 }
 
@@ -91,6 +117,7 @@ body.bruno-body {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  justify-content: flex-start;
 }
 
 .bruno-action-label {
@@ -126,6 +153,17 @@ body.bruno-body {
 
 .bruno-file-meta {
   font-size: 0.7rem;
+  display: block;
+}
+
+.bruno-file-error {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #b91c1c;
+  display: none;
+}
+
+.bruno-file-error.show {
   display: block;
 }
 

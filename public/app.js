@@ -6,6 +6,7 @@ const state = {
   selectedItem: null,
   table: null,
   tableClickBound: false,
+  manualLoad: false,
   filters: {
     search: "",
     status: "all",
@@ -93,12 +94,19 @@ function init() {
 async function loadFromServer() {
   try {
     const response = await fetch("/api/results", { cache: "no-store" });
-    if (!response.ok) {
+    if (!response.ok || state.manualLoad) {
       return;
     }
     const size = Number(response.headers.get("content-length") || 0);
     const name = response.headers.get("x-results-file") || "results.json";
     const data = await response.json();
+    if (state.manualLoad) {
+      return;
+    }
+    const errorMessage = validateResultsData(data);
+    if (errorMessage) {
+      return;
+    }
     consumeData(data, { name, size, source: "server" });
   } catch (error) {
     // Silent if no server file is configured.
@@ -106,21 +114,29 @@ async function loadFromServer() {
 }
 
 function readFile(file) {
+  state.manualLoad = true;
+  clearLoadError();
   showToast(`Loading ${file.name}...`);
   const reader = new FileReader();
   reader.onload = async () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 0));
       const data = JSON.parse(reader.result);
+      const errorMessage = validateResultsData(data);
+      if (errorMessage) {
+        showLoadError("No se ha podido cargar el archivo. Revisa el formato JSON.");
+        return;
+      }
       consumeData(data, { name: file.name, size: file.size, source: "file" });
     } catch (error) {
-      showToast("Could not parse JSON. Check the file format.");
+      showLoadError("No se ha podido cargar el archivo. Revisa el formato JSON.");
     }
   };
   reader.readAsText(file);
 }
 
 function consumeData(data, meta) {
+  clearLoadError();
   const normalized = normalizeData(data);
   state.runs = normalized.runs;
   state.results = normalized.results;
@@ -171,7 +187,23 @@ function resetFilters(shouldRender = true) {
 }
 
 function normalizeData(data) {
-  const runs = Array.isArray(data) ? data : [data];
+  let runs = [];
+  if (Array.isArray(data)) {
+    const hasRunResults = data.some((run) => isRunWithResults(run));
+    if (hasRunResults) {
+      runs = data;
+    } else if (data.every((item) => isResultLike(item))) {
+      runs = [{ results: data }];
+    } else {
+      runs = data;
+    }
+  } else if (isRunWithResults(data)) {
+    runs = [data];
+  } else if (isResultLike(data)) {
+    runs = [{ results: [data] }];
+  } else {
+    runs = [data];
+  }
   const results = [];
 
   runs.forEach((run, runIndex) => {
@@ -222,6 +254,53 @@ function normalizeData(data) {
   });
 
   return { runs, results };
+}
+
+function validateResultsData(data) {
+  if (!data || typeof data !== "object") {
+    return "Invalid results JSON: expected an object or array.";
+  }
+  if (Array.isArray(data)) {
+    if (data.length === 0) {
+      return "Invalid results JSON: no runs found.";
+    }
+    if (data.some((run) => isRunWithResults(run))) {
+      return "";
+    }
+    if (data.every((item) => isResultLike(item))) {
+      return "";
+    }
+    return "Invalid results JSON: missing results array.";
+  }
+  if (isRunWithResults(data) || isResultLike(data)) {
+    return "";
+  }
+  return "Invalid results JSON: missing results array.";
+}
+
+function isRunWithResults(run) {
+  return (
+    run &&
+    typeof run === "object" &&
+    !Array.isArray(run) &&
+    Array.isArray(run.results)
+  );
+}
+
+function isResultLike(result) {
+  return (
+    result &&
+    typeof result === "object" &&
+    !Array.isArray(result) &&
+    ("request" in result ||
+      "response" in result ||
+      "testResults" in result ||
+      "assertionResults" in result ||
+      "runDuration" in result ||
+      "path" in result ||
+      "name" in result ||
+      "error" in result)
+  );
 }
 
 function buildPathGroup(path) {
@@ -625,6 +704,7 @@ function renderSummary() {
     column.appendChild(cardEl);
     summaryEl.appendChild(column);
   });
+
 }
 
 function buildSummary(results) {
@@ -1237,6 +1317,20 @@ function showToast(message) {
   toast.textContent = message;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function showLoadError(message) {
+  const errorEl = $("#file-error");
+  if (!errorEl) return;
+  errorEl.textContent = message;
+  errorEl.classList.add("show");
+}
+
+function clearLoadError() {
+  const errorEl = $("#file-error");
+  if (!errorEl) return;
+  errorEl.textContent = "";
+  errorEl.classList.remove("show");
 }
 
 window.addEventListener("DOMContentLoaded", init);
