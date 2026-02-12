@@ -30,6 +30,15 @@ npx @angoru/brunoview /path/to/results.json
 
 > **Note:** BrunoView requires [Bun](https://bun.sh) to run. If Bun is not installed, the CLI will attempt to use it via npx.
 
+### Version Troubleshooting
+
+If `brunoview --version` still shows an older version after install, you are likely
+running a global binary while updating only local dependencies.
+
+- Check current binary path: `which brunoview`
+- Check global package version: `npm ls -g @angoru/brunoview`
+- Update global install: `npm install -g @angoru/brunoview@latest`
+
 ## Load manually
 
 - Click **Load JSON file** and select a file.

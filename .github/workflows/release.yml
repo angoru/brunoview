@@ -47,6 +47,33 @@ jobs:
         if: steps.version-check.outputs.new == 'true'
         run: |
           echo "Publishing v${{ steps.version-check.outputs.local }} (npm has v${{ steps.version-check.outputs.published }})"
-          npm publish --access public
+          set -euo pipefail
+          ATTEMPT=1
+          MAX_ATTEMPTS=4
+          while [ "$ATTEMPT" -le "$MAX_ATTEMPTS" ]; do
+            echo "npm publish attempt $ATTEMPT/$MAX_ATTEMPTS"
+            OUTPUT_FILE=$(mktemp)
+            if npm publish --access public >"$OUTPUT_FILE" 2>&1; then
+              cat "$OUTPUT_FILE"
+              echo "Publish completed."
+              exit 0
+            fi
+            cat "$OUTPUT_FILE"
+
+            if ! grep -q "npm error code E409" "$OUTPUT_FILE"; then
+              echo "Publish failed with non-retryable error."
+              exit 1
+            fi
+
+            if [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; then
+              SLEEP_SECONDS=$((ATTEMPT * 20))
+              echo "Detected E409 conflict. Waiting ${SLEEP_SECONDS}s before retry..."
+              sleep "$SLEEP_SECONDS"
+            fi
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+          echo "npm publish failed after ${MAX_ATTEMPTS} attempts."
+          exit 1
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
