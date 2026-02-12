@@ -148,4 +148,43 @@ describe("filterResults", () => {
     const outcome = decideOutcome(result, stats, result.response.status);
     expect(outcome).toBe("fail");
   });
+
+  test("supports issues status filter and stream sort", () => {
+    const base = normalizeData([
+      {
+        name: "Pass item",
+        path: "users/pass.bru",
+        request: { method: "GET", url: "https://api.local/pass" },
+        response: { status: 200 },
+      },
+      {
+        name: "Fail item",
+        path: "users/fail.bru",
+        request: { method: "GET", url: "https://api.local/fail" },
+        response: { status: 500 },
+      },
+      {
+        name: "Error item",
+        path: "users/error.bru",
+        request: { method: "GET", url: "https://api.local/error" },
+        response: { status: 0 },
+        error: { message: "network" },
+      },
+    ]);
+
+    const filtered = filterResults(base.results, {
+      search: "",
+      status: "issues",
+      methods: new Set(),
+      http: new Set(["2xx", "3xx", "4xx", "5xx", "other"]),
+      runs: new Set(),
+      paths: new Set(),
+      searchScopes: new Set(["name", "path", "url", "method"]),
+      sort: "stream",
+    });
+
+    expect(filtered.length).toBe(2);
+    expect(filtered.every((item) => item.outcome !== "pass")).toBe(true);
+    expect(filtered[0].name).toBe("Error item");
+  });
 });

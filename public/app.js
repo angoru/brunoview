@@ -160,19 +160,19 @@ function consumeData(data, meta) {
 
 function resetFilters(shouldRender = true) {
   state.filters.search = "";
-  state.filters.status = "all";
+  state.filters.status = "issues";
   state.filters.methods = new Set();
   state.filters.http = new Set(["2xx", "3xx", "4xx", "5xx", "other"]);
   state.filters.runs = new Set();
   state.filters.paths = new Set();
   state.filters.searchScopes = new Set(["name", "path", "url", "method"]);
-  state.filters.sort = "status";
+  state.filters.sort = "stream";
 
   const searchInput = $("#search-input");
   if (searchInput) searchInput.value = "";
 
   const sortSelect = $("#sort-select");
-  if (sortSelect) sortSelect.value = "status";
+  if (sortSelect) sortSelect.value = "stream";
 
   buildMethodFilters();
   buildRunFilters();

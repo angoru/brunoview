@@ -28,13 +28,13 @@ const state = {
   activeReadId: 0,
   filters: {
     search: "",
-    status: "all",
+    status: "issues",
     methods: new Set(),
     http: new Set(["2xx", "3xx", "4xx", "5xx", "other"]),
     runs: new Set(),
     paths: new Set(),
     searchScopes: new Set(["name", "path", "url", "method"]),
-    sort: "status",
+    sort: "stream",
   },
 };
 

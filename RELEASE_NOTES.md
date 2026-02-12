@@ -1,5 +1,19 @@
 # Release Notes
 
+## 0.2.2 - 2026-02-12
+
+### Changed
+- Defaulted the main table to a failure-focused stream (`ISSUES`) instead of all results.
+- Added `Failure stream` sorting mode to prioritize most recent failing/error entries.
+- Updated table heading to `Failure Stream` for clearer triage intent.
+
+### Fixed
+- Reduced detail-panel noise by collapsing heavy sections (`Headers`, `Body`, `Data`, `Error`) by default.
+- Improved JSON/log readability with smarter truncation and better monospace styling.
+
+### Added
+- Core test coverage for `issues` filtering and `stream` sorting behavior.
+
 ## 0.2.1 - 2026-02-12
 
 ### Added

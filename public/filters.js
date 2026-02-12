@@ -1,11 +1,11 @@
 function buildStatusFilters() {
   const container = $("#status-filters");
   container.innerHTML = "";
-  ["all", "pass", "fail", "error"].forEach((status) => {
+  ["issues", "all", "pass", "fail", "error"].forEach((status) => {
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = `btn btn-sm btn-outline-secondary bruno-chip ${status}`;
-    chip.textContent = status.toUpperCase();
+    chip.textContent = status === "issues" ? "ISSUES" : status.toUpperCase();
     chip.setAttribute("role", "switch");
     if (status === state.filters.status) {
       chip.classList.add("active");

@@ -109,19 +109,19 @@ function buildRequestSection(item) {
   details.appendChild(list);
 
   if (request.headers && Object.keys(request.headers).length) {
-    const headersTitle = document.createElement("h4");
-    headersTitle.className = "h6 mt-3";
-    headersTitle.textContent = "Headers";
-    details.appendChild(headersTitle);
-    details.appendChild(renderKeyValueTable(request.headers));
+    details.appendChild(
+      buildCompactBlock(
+        "Headers",
+        `${Object.keys(request.headers).length} entries`,
+        renderKeyValueTable(request.headers)
+      )
+    );
   }
 
   if (request.body !== undefined) {
-    const bodyTitle = document.createElement("h4");
-    bodyTitle.className = "h6 mt-3";
-    bodyTitle.textContent = "Body";
-    details.appendChild(bodyTitle);
-    details.appendChild(renderJsonBlock(request.body));
+    details.appendChild(
+      buildCompactBlock("Body", "payload", renderJsonBlock(request.body, false, 8000))
+    );
   }
 
   return details;
@@ -130,7 +130,7 @@ function buildRequestSection(item) {
 function buildResponseSection(item) {
   const details = document.createElement("details");
   details.className = "detail-section";
-  details.open = true;
+  details.open = item.outcome !== "pass";
 
   const summary = document.createElement("summary");
   summary.textContent = "Response";
@@ -151,27 +151,25 @@ function buildResponseSection(item) {
   details.appendChild(list);
 
   if (response.headers && Object.keys(response.headers).length) {
-    const headersTitle = document.createElement("h4");
-    headersTitle.className = "h6 mt-3";
-    headersTitle.textContent = "Headers";
-    details.appendChild(headersTitle);
-    details.appendChild(renderKeyValueTable(response.headers));
+    details.appendChild(
+      buildCompactBlock(
+        "Headers",
+        `${Object.keys(response.headers).length} entries`,
+        renderKeyValueTable(response.headers)
+      )
+    );
   }
 
   if (response.data !== undefined) {
-    const dataTitle = document.createElement("h4");
-    dataTitle.className = "h6 mt-3";
-    dataTitle.textContent = "Data";
-    details.appendChild(dataTitle);
-    details.appendChild(renderJsonBlock(response.data, true));
+    details.appendChild(
+      buildCompactBlock("Data", "payload", renderJsonBlock(response.data, true, 12000))
+    );
   }
 
   if (item.error) {
-    const errorTitle = document.createElement("h4");
-    errorTitle.className = "h6 mt-3";
-    errorTitle.textContent = "Error";
-    details.appendChild(errorTitle);
-    details.appendChild(renderJsonBlock(item.error, true));
+    details.appendChild(
+      buildCompactBlock("Error", "details", renderJsonBlock(item.error, true, 12000), true)
+    );
   }
 
   return details;
@@ -249,7 +247,7 @@ function renderKeyValueTable(obj) {
   return list;
 }
 
-function renderJsonBlock(value, light = false, maxChars = 20000) {
+function renderJsonBlock(value, light = false, maxChars = 6000, maxLines = 120) {
   const container = document.createElement("div");
   const actions = document.createElement("div");
   actions.className = "json-actions";
@@ -264,8 +262,17 @@ function renderJsonBlock(value, light = false, maxChars = 20000) {
   const pre = document.createElement("pre");
   pre.className = `json-block ${light ? "light" : ""}`;
 
-  if (fullText.length > maxChars) {
-    const truncated = `${fullText.slice(0, maxChars)}\n... truncated ...`;
+  const lines = fullText.split("\n");
+  const lineLimited =
+    lines.length > maxLines
+      ? `${lines.slice(0, maxLines).join("\n")}\n... truncated (${lines.length - maxLines} lines hidden) ...`
+      : fullText;
+
+  if (lineLimited.length > maxChars || lines.length > maxLines) {
+    const truncated =
+      lineLimited.length > maxChars
+        ? `${lineLimited.slice(0, maxChars)}\n... truncated (${lineLimited.length - maxChars} chars hidden) ...`
+        : lineLimited;
     pre.textContent = truncated;
 
     const toggle = document.createElement("button");
@@ -298,6 +305,18 @@ function makeMetaChip(text, tone = "text-bg-light") {
   return chip;
 }
 
+function buildCompactBlock(label, meta, content, open = false) {
+  const details = document.createElement("details");
+  details.className = "detail-subsection";
+  details.open = open;
+
+  const summary = document.createElement("summary");
+  summary.textContent = meta ? `${label} (${meta})` : label;
+  details.appendChild(summary);
+  details.appendChild(content);
+  return details;
+}
+
 function addKeyValue(list, key, value) {
   const dt = document.createElement("dt");
   dt.textContent = key;
@@ -306,4 +325,3 @@ function addKeyValue(list, key, value) {
   list.appendChild(dt);
   list.appendChild(dd);
 }
-

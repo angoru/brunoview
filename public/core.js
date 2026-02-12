@@ -68,6 +68,7 @@
         results.push({
           id: `${runIndex}-${index}`,
           runIndex,
+          resultIndex: index,
           iterationIndex: result.iterationIndex ?? runObject.iterationIndex ?? 0,
           name,
           path,
@@ -229,7 +230,11 @@
         : getSearchText(item, scopes).includes(search);
 
       const matchesStatus =
-        statusFilter === "all" ? true : item.outcome === statusFilter;
+        statusFilter === "all"
+          ? true
+          : statusFilter === "issues"
+          ? item.outcome === "fail" || item.outcome === "error"
+          : item.outcome === statusFilter;
 
       const matchesMethod = methods.size === 0 ? true : methods.has(item.method);
 
@@ -256,6 +261,14 @@
     const copy = [...results];
     if (sortKey === "name") {
       copy.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortKey === "stream") {
+      copy.sort((a, b) => {
+        if (a.runIndex !== b.runIndex) return b.runIndex - a.runIndex;
+        if ((a.iterationIndex || 0) !== (b.iterationIndex || 0)) {
+          return (b.iterationIndex || 0) - (a.iterationIndex || 0);
+        }
+        return (b.resultIndex || 0) - (a.resultIndex || 0);
+      });
     } else if (sortKey === "duration") {
       copy.sort((a, b) => (a.runDuration || 0) - (b.runDuration || 0));
     } else if (sortKey === "http") {
