@@ -19,6 +19,11 @@ for (let i = 0; i < args.length; i += 1) {
     printHelp();
     process.exit(0);
   }
+  if (arg === "--version" || arg === "-v") {
+    const version = await readVersion();
+    console.log(version);
+    process.exit(0);
+  }
   if (arg === "--no-open") {
     options.open = false;
     continue;
@@ -108,7 +113,7 @@ if (options.open) {
 }
 
 function printHelp() {
-  console.log(`\nBrunoView (Bun)\n\nUsage:\n  bun run brunoview.ts [results.json]\n\nOptions:\n  --file <path>      Path to results.json to preload\n  --public <path>    Override path to the public assets directory\n  --host <host>      Host interface to bind (default: 127.0.0.1)\n  --port <port>      Port to bind (default: auto)\n  --no-open          Do not open the browser automatically\n`);
+  console.log(`\nBrunoView (Bun)\n\nUsage:\n  bun run brunoview.ts [results.json]\n\nOptions:\n  -h, --help         Show this help message\n  -v, --version      Show the current version\n  --file <path>      Path to results.json to preload\n  --public <path>    Override path to the public assets directory\n  --host <host>      Host interface to bind (default: 127.0.0.1)\n  --port <port>      Port to bind (default: auto)\n  --no-open          Do not open the browser automatically\n`);
 }
 
 function openBrowser(targetUrl) {
@@ -156,4 +161,18 @@ function resolvePublicDir(override) {
 
 function normalizePath(value) {
   return resolve(value);
+}
+
+async function readVersion() {
+  const packagePath = fileURLToPath(new URL("./package.json", import.meta.url));
+  if (!existsSync(packagePath)) {
+    console.error("package.json not found to resolve version.");
+    process.exit(1);
+  }
+  const pkg = await Bun.file(packagePath).json();
+  if (!pkg || typeof pkg.version !== "string") {
+    console.error("Version not found in package.json.");
+    process.exit(1);
+  }
+  return pkg.version;
 }
